@@ -1,70 +1,90 @@
-# Getting Started with Create React App
+# Redux Middleware
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+함수를 2번 리턴하는 함수
 
-## Available Scripts
+```javascript
+//Arrow Function
+const middleware = store => next => action => {
+  //To Do
+}
+//Normal Function
+function middleware(store) {
+  return function (next) {
+    return function (action) {
 
-In the project directory, you can run:
+    };
+  };
+}
+```
+- `store`: redux store instance
+  - `dispatch`, `getState`, `subscribe` 등 내장 함수가 들어있다
+- `next`: 다음 미들웨어에 전달하는 함수
+  - `next(action)` 형태로 사용한다
+  - 다음 미들웨어가 없다 > `reducer`에게 `action`을 전달한다
+  - `next` 미호출 시 액션이 무시 처리되어 `reducer`에게 전달되지 않는다
+- `action`: 현재 처리하고 있는 액션 객체이다
 
-### `npm start`
+redux store에는 여러 개의 미들웨어 등록 가능
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+새로운 `action`이 `dispatch`되면 첫 번째로 등록한 미들웨어가 호출된다
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+만약 미들웨어에서 `store.dispatch`를 사용하면 다른 `action`을 추가적으로 발생시킬 수 있다
 
-### `npm test`
+### Create Middleware Example
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```javascript
+const myLogger = store => next => action => {
+  console.log(action);
+  const result = next(action);
+  return result;
+}
 
-### `npm run build`
+export default myLogger;
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Apply Middleware Example
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```javascript
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './index.css';
+import App from './App';
+import * as serviceWorker from './serviceWorker';
+import { createStore, applyMiddleware } from 'redux';
+import { Provider } from 'react-redux';
+import rootReducer from './modules';
+import myLogger from './middlewares/myLogger';
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+const store = createStore(rootReducer, applyMiddleware(myLogger));
 
-### `npm run eject`
+ReactDOM.render(
+  <Provider store={store}>
+    <App />
+  </Provider>
+  document.getElementById('root');
+)
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+![middleware](./readmeImg/스크린샷%202021-09-23%2011.41.18.png)
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## redux-thunk
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+```javascript
+export const thunks = parameters => (dispatch, getState) => {
+  //my Logic
+}
+```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+thunk란 몇 가지의 parameters를 인수로 취하고 또 다른 함수를 return하는 함수이다
 
-## Learn More
+내부 함수로 `dispatch`와 `getState`함수를 사용한다
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
 
-### Code Splitting
+## redux-saga
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+`saga`라 명명된 순수함수로 복잡한 어플리케이션 로직을 표현할 수 있게 해준다
 
-### Analyzing the Bundle Size
+*generator*라 불리는 특별한 함수로 구성되어 있다
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
 
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
