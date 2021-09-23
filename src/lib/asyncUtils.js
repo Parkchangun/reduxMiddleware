@@ -57,7 +57,7 @@ export const createPromiseThunkById = (
 export const createPromiseSaga = (type, promiseCreator) => {
   const [SUCCESS, ERROR] = [`${type}_SUCCESS`, `${type}_ERROR`];
 
-  return function* saga(action) {
+  return function* (action) {
     try {
       const result = yield call(promiseCreator, action.payload);
       yield put({
@@ -69,6 +69,29 @@ export const createPromiseSaga = (type, promiseCreator) => {
         type: ERROR,
         payload: e,
         error: true
+      })
+    }
+  }
+}
+
+export const createPromiseSagaById = (type, promiseCreator) => {
+  const [SUCCESS, ERROR] = [`${type}_SUCCESS`, `${type}_ERROR`];
+
+  return function* (action) {
+    const id = action.meta;
+    try {
+      const result = yield call(promiseCreator, action.payload);
+      yield put({
+        type: SUCCESS,
+        payload: result,
+        meta: id
+      })
+    } catch (e) {
+      yield put({
+        type: ERROR,
+        payload: e,
+        error: true,
+        meta: id
       })
     }
   }
@@ -113,7 +136,7 @@ export const handleAsyncActionsId = (type, key, keepData) => {
           [key]: {
             ...state[key],
             [id]: reducerUtils.loading(
-              //
+              //[key][id]의 유효성 검사, &&을 통해 state[key][id]가 false일 때 [key][id].data값 반환
               keepData ? state[key][id] && state[key][id].data : null
             ),
           },

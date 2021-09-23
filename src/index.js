@@ -10,11 +10,15 @@ import logger from 'redux-logger';
 import {composeWithDevTools} from 'redux-devtools-extension';
 import ReduxThunk from 'redux-thunk';
 import {Router} from 'react-router-dom';
-import createSaga from 'redux-saga';
+import createSagaMiddleware from 'redux-saga';
 import {createBrowserHistory} from 'history';
 
 const customHistory = createBrowserHistory();
-const sagaMiddleware = createSaga();
+const sagaMiddleware = createSagaMiddleware({
+  context: {
+    history: customHistory
+  }
+});
 
 const store = createStore(
   rootReducer,
