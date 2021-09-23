@@ -1,0 +1,24 @@
+{
+  "posts": [
+    {
+      "title": "다시 변경했어요!",
+      "body": "신규 테스트 중입니다",
+      "id": 1
+    },
+    {
+      "id": 2,
+      "title": "react",
+      "body": "very funny"
+    },
+    {
+      "id": 3,
+      "title": "redux-thunk",
+      "body": "can async function dispatch"
+    },
+    {
+      "title": "테스트중입니다",
+      "body": "신규 테스트 중입니다",
+      "id": 4
+    }
+  ]
+}
